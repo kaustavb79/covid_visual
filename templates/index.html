@@ -1,17 +1,53 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
-    {{ js_resources|indent(4)|safe }}
-    {{ css_resources|indent(4)|safe }}
-    {{ plot_script|indent(4)|safe }}
+  <meta charset="utf-8" />
+  <title>{{ title }}</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
+  <link rel="stylesheet" href="./static/style.css"/>
 </head>
+
 <body>
-    <h1 style="text-align: center; margin-bottom: 40px;">Flask + Bokeh + EasyBase.io</h1>
-    <div style="display: flex; justify-content: center;">
-        {{ plot_div|indent(4)|safe }}
-    </div>
+    <h1>{{ title }}</h1>
+    <div class="chart-container">
+        <canvas id="line_chart"></canvas>
+    </div>   
+    <script>
+        // Line chart 
+        const line_chart_tag = document.getElementById('line_chart').getContext('2d');
+        const line_chart = new Chart(line_chart_tag, {
+            type: "line",
+            data: {
+                labels: [
+                    {% for item in labels %}
+                        "{{ item }}",
+                    {% endfor %}
+                ],
+                datasets: [{
+                    label: "{{ plot_label }}",
+                    pointRadius: 4,
+                    pointBackgroundColor: "rgb(0,0,255)",
+                    data: [
+                            {% for item in values %}
+                                {{ item }},
+                            {% endfor %}
+                    ],
+                    backgroundColor: [
+                        'rgb(230, 255, 255)'
+                    ],                 
+                    borderWidth: 1,
+                }]
+            },
+            options: {
+                // legend: {display: false},
+                scales: {
+                    y: {
+                        beginAtZero: true
+                    }
+                }
+            }
+        });
+        line_chart.resize(200,200);
+    </script>
 </body>
 </html>

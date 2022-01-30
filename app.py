@@ -1,41 +1,33 @@
-from flask import Flask, render_template
-from bokeh.models import ColumnDataSource, Div, Select, Slider, TextInput
-from bokeh.io import curdoc
-from bokeh.resources import INLINE
-from bokeh.embed import components
-from bokeh.plotting import figure, output_file, show
+from flask import Flask, Markup, render_template
+from data.covid_data import CovidData
 
 app = Flask(__name__)
 
-@app.route('/')
-def index():
-    source = ColumnDataSource()
+def get_world_count():
+    pass
 
-    fig = figure(plot_height=600, plot_width=720, tooltips=[("Title", "@title"), ("Released", "@released")])
-    fig.circle(x="x", y="y", source=source, size=5, color="color", line_color=None)
-    fig.xaxis.axis_label = "IMDB Rating"
-    fig.yaxis.axis_label = "Rotten Tomatoes Rating"
+@app.route('/',methods=['GET', 'POST'])
+def home_page() :
+    data_url = r"https://github.com/owid/covid-19-data/blob/master/public/data/jhu/full_data.csv?raw=true"
+    obj = CovidData(data_url)
 
-    currMovies = selectedMovies()
+    locations = obj.get_locations()
+    years = obj.get_years()
+    months = obj.get_months()
 
-    source.data = dict(
-        x = [d['imdbrating'] for d in currMovies],
-        y = [d['numericrating'] for d in currMovies],
-        color = ["#FF9900" for d in currMovies],
-        title = [d['title'] for d in currMovies],
-        released = [d['released'] for d in currMovies],
-        imdbvotes = [d['imdbvotes'] for d in currMovies],
-        genre = [d['genre'] for d in currMovies]
-    )
+    loc = "India"
+    yr = 2021
+    col = "Total Cases"
+    x_label = "Months"
+    yearly_data = obj.get_month_end_data_by_location_and_year(loc,yr)
 
-    script, div = components(fig)
-    return render_template(
-        'index.html',
-        plot_script=script,
-        plot_div=div,
-        js_resources=INLINE.render_js(),
-        css_resources=INLINE.render_css(),
-    ).encode(encoding='UTF-8')
+    return render_template('index.html',
+                title = "SARS-CoV-2 Data",
+                max = 500,
+                labels = yearly_data["month"].tolist(),
+                values = yearly_data["total_cases"].tolist(),
+                plot_label = "{} in {} for {}".format(col,loc,yr)
+            )
 
-if __name__ == "__main__":
-    app.run(debug=True)
+if __name__ == '__main__':
+    app.run(host='0.0.0.0', port=8080,debug=True)

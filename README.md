@@ -2,5 +2,5 @@
 Covid 19 Real Time Visualisation Dashboard
 
 # References
-- https://docs.bokeh.org/en/latest/
-- https://betterprogramming.pub/deploy-interactive-real-time-data-visualizations-on-flask-with-bokeh-311239273838
+- https://github.com/chartjs/Chart.js
+- https://www.chartjs.org/docs/master/
