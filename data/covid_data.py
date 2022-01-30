@@ -122,7 +122,7 @@ class CovidData:
             most_recent_date = month_data['CheckDate'].max()
             month_data = month_data[month_data["CheckDate"] == most_recent_date]
             empty_frame = empty_frame.append(month_data)
-        print(empty_frame)
+        # print(empty_frame)
         return empty_frame
 
     """

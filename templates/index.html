@@ -9,45 +9,126 @@
 
 <body>
     <h1>{{ title }}</h1>
-    <div class="chart-container">
-        <canvas id="line_chart"></canvas>
-    </div>   
+    <form action="" method="post">
+
+    </form>
+    <div class="canvas_container">
+        <canvas id="line_chart"></canvas> 
+        <canvas id="bar_chart"></canvas>
+    </div>
     <script>
+        // label declaration
+        var labels_list = [
+                    {% for item in labels %}
+                        "{{ item }}",
+                    {% endfor %}
+        ]
+
+        // data declaration
+        var data_list = [
+            {% for item in values %}
+                {{ item }},
+            {% endfor %}
+        ]
+
+        var plot_title = "{{ plot_label }}"
+
+        var options = {
+            responsive: false,
+            scales: {
+                xAxes: [{
+                    ticks: {
+                    maxRotation: 90,
+                    minRotation: 80
+                    },
+                    gridLines: {
+                        offsetGridLines: true 
+                    }
+                },
+                {
+                    position: "top",
+                    ticks: {
+                        maxRotation: 90,
+                        minRotation: 80
+                    },
+                    gridLines: {
+                        offsetGridLines: true 
+                    }
+                }],
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            }
+        }
+
         // Line chart 
         const line_chart_tag = document.getElementById('line_chart').getContext('2d');
         const line_chart = new Chart(line_chart_tag, {
             type: "line",
             data: {
-                labels: [
-                    {% for item in labels %}
-                        "{{ item }}",
-                    {% endfor %}
-                ],
-                datasets: [{
-                    label: "{{ plot_label }}",
-                    pointRadius: 4,
-                    pointBackgroundColor: "rgb(0,0,255)",
-                    data: [
-                            {% for item in values %}
-                                {{ item }},
-                            {% endfor %}
-                    ],
-                    backgroundColor: [
-                        'rgb(230, 255, 255)'
-                    ],                 
-                    borderWidth: 1,
-                }]
-            },
-            options: {
-                // legend: {display: false},
-                scales: {
-                    y: {
-                        beginAtZero: true
+                labels: labels_list,
+                datasets: [
+                    {
+                        label: plot_title,
+                        pointRadius: 4,
+                        pointBackgroundColor: "rgb(0,0,255)",
+                        data: data_list,
+                        backgroundColor: [
+                            'rgb(230, 255, 255)'
+                        ],                 
+                        borderWidth: 3,
                     }
-                }
-            }
+                ]
+            },
+            options: options
         });
-        line_chart.resize(200,200);
+
+        // BAr Chart
+        var bar_chart_element = document.getElementById("bar_chart");
+        var bar_chart = new Chart(bar_chart_element, {
+            type: 'bar',
+            data: {
+                labels: labels_list,
+                datasets: [
+                    {
+                        label: plot_title,
+                        data: data_list,
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255,99,132,1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(255,99,132,1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: options
+        });
     </script>
 </body>
 </html>
