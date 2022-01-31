@@ -5,23 +5,48 @@
   <title>{{ title }}</title>
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.7.0/dist/chart.min.js"></script>
   <link rel="stylesheet" href="./static/style.css"/>
+  <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+  <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
 </head>
 
 <body>
-    <h1>{{ title }}</h1>
-    <form action="" method="post">
-
-    </form>
-    <div class="canvas_container">
-        <canvas id="line_chart"></canvas> 
-        <canvas id="bar_chart"></canvas>
-    </div>
+    <h1>{{ title }}</h1>    
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col">        
+                <form action="" method="post">
+                    <div class="col-md-8">
+                        <label for="validationCustom04" class="form-label">Country</label>
+                        <select class="form-select" id="validationCustom04" required>
+                          <option selected disabled value="">Choose...</option>
+                            {% for item in location_list %}
+                                <option value={{ item }}>{{ item }}</option>,
+                            {% endfor %}                          
+                        </select>
+                        <div class="invalid-feedback">
+                          Please select a valid country.
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">        
+                <canvas id="line_chart"></canvas> 
+            </div>
+            <div class="col">
+                <canvas id="bar_chart"></canvas>
+            </div>    
+        </div>
+    </div>    
     <script>
         // label declaration
         var labels_list = [
-                    {% for item in labels %}
-                        "{{ item }}",
-                    {% endfor %}
+            {% for item in labels %}
+                "{{ item }}",
+            {% endfor %}
         ]
 
         // data declaration
@@ -96,18 +121,18 @@
                         label: plot_title,
                         data: data_list,
                         backgroundColor: [
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)',
-                            'rgba(255, 99, 132, 0.2)',
-                            'rgba(54, 162, 235, 0.2)',
-                            'rgba(255, 206, 86, 0.2)',
-                            'rgba(75, 192, 192, 0.2)',
-                            'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)'
+                            'rgba(255, 99, 132)',
+                            'rgba(54, 162, 235)',
+                            'rgba(255, 206, 86)',
+                            'rgba(75, 192, 192)',
+                            'rgba(153, 102, 255)',
+                            'rgba(255, 159, 64)',
+                            'rgba(255, 99, 132)',
+                            'rgba(54, 162, 235)',
+                            'rgba(255, 206, 86)',
+                            'rgba(75, 192, 192)',
+                            'rgba(153, 102, 255)',
+                            'rgba(255, 159, 64)'
                         ],
                         borderColor: [
                             'rgba(255,99,132,1)',

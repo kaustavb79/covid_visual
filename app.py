@@ -15,9 +15,9 @@ def home_page() :
     years = obj.get_years()
     months = obj.get_months()
 
-    loc = "India"
+    loc = "Canada"
     yr = 2021
-    col = "Total Cases"
+    col = "New Cases"
     x_label = "Months"
     yearly_data = obj.get_month_end_data_by_location_and_year(loc,yr)
 
@@ -25,8 +25,11 @@ def home_page() :
                 title = "SARS-CoV-2 Data",
                 max = 500,
                 labels = yearly_data["month"].tolist(),
-                values = yearly_data["total_cases"].tolist(),
-                plot_label = "{} in {} for {}".format(col,loc,yr)
+                values = yearly_data["new_cases"].tolist(),
+                plot_label = "{} in {} for {}".format(col,loc,yr),
+                location_list = locations,
+                years_list = years,
+                months_list = months
             )
 
 if __name__ == '__main__':
