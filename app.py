@@ -10,38 +10,73 @@ obj = CovidData(data_url)
 def change_view():
     if request.method == 'POST':
         data = request.get_json()
-        if not data["month"]:
-            if not data["year"]:
-                data["year"] = "2021"
-            yearly_data = obj.get_month_end_data_by_location_and_year(data["country"],int(data["year"]))
-            if not data["column"]:
-                data["column"] = "total_cases"
-            else:
-                data["column"] = data["column"].replace(" ","_").lower()
-            result = {
-                "data":" ".join([str(x) for x in yearly_data[data["column"]].to_list()]),
-                "labels":" ".join([str(x) for x in yearly_data["month"].tolist()]),
-                "plot_label": "{} in {} for {}".format(data["column"].replace("_"," ").capitalize(),data["country"],data["year"])
-            }
+        # print(data)
+        if not data["year"]:
+            data["year"] = "2022"
+        yearly_data = obj.get_month_end_data_by_location_and_year(data["country"],int(data["year"]))
+        total_cases_lst = yearly_data["total_cases"].tolist()
+        total_cases_lst.sort()
+        total_deaths_lst = yearly_data["total_deaths"].tolist()
+        total_deaths_lst.sort()
+        if not data["column"]:
+            data["column"] = "total_cases"
+        else:
+            data["column"] = data["column"].replace(" ","_").lower()
+        result = {
+            "data":"",
+            "labels":"",
+            "plot_label":"",
+            "total_cases":" ".join([str(int(x)) for x in total_cases_lst]),
+            "total_deaths":" ".join([str(int(x)) for x in total_deaths_lst]),
+            "new_cases":" ".join([str(int(x)) for x in yearly_data["new_cases"].tolist()]),
+            "new_deaths":" ".join([str(int(x)) for x in yearly_data["new_deaths"].tolist()]),
+            "column":"{}".format(data["column"].replace("_"," ").capitalize())
+        }   
+        if not data["month"] or "Choose" in data["month"]:            
+            result["data"] = " ".join([str(int(x)) for x in yearly_data[data["column"]].to_list()]);
+            result["labels"] = " ".join([str(x) for x in yearly_data["month"].tolist()]);
+            result["plot_label"] = "{} in {} for {}".format(data["column"].replace("_"," ").capitalize(),data["country"],data["year"])
+        else:
+            month_result = obj.get_data_by_location_and_month_of_year(data["country"],int(data["year"]),data["month"])
+            result["data"] = " ".join([str(int(x)) for x in month_result[data["column"]].to_list()]);
+            result["labels"] = " ".join([str(x) for x in month_result["date"].tolist()]);
+            result["plot_label"] = "{} in {} for {}-{}".format(data["column"].replace("_"," ").capitalize(),data["country"],data["month"],data["year"])
         return(result)
 
 @app.route('/')
 def home_page():    
     loc = "World"
-    yr = 2021
+    yr = 2022
     col = "Total Cases"
     x_label = "Months"
     default_data = obj.get_month_end_data_by_location_and_year(loc,yr)
+    # default_data = obj.get_world_data()
+
+    total_cases_lst = default_data["total_cases"].tolist()
+    total_cases_lst.sort()
+    total_deaths_lst = default_data["total_deaths"].tolist()
+    total_deaths_lst.sort()
+    new_cases_lst = default_data["new_cases"].tolist()
+    # new_cases_lst.sort()
+    new_deaths_lst = default_data["new_deaths"].tolist()
+    # new_deaths_lst.sort()
+
     return render_template('dashboard.html',
                 title = "SARS-CoV-2 Data",
-                max = 500,
+                column = col,
                 labels = default_data["month"].tolist(),
                 values = default_data["total_cases"].tolist(),
-                plot_label = "{} in {} for {}".format(col,loc,yr),
+                plot_label = "{} in {} for {}".format(col,loc,2022),
                 location_list = obj.get_locations(),
                 years_list = obj.get_years(),
                 months_list = obj.get_months(),
-                disp_type = obj.get_columns()
+                disp_type = obj.get_columns(),
+                total_cases = list(map(int,total_cases_lst)),
+                total_deaths = list(map(int,total_deaths_lst)),
+                new_cases = list(map(int,new_cases_lst)),
+                new_deaths = list(map(int,new_deaths_lst)),
+                update = default_data['CheckDate'].max(),
+                location = loc
             )
 
 if __name__ == '__main__':

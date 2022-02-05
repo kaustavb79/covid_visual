@@ -28,7 +28,7 @@
                   <div class="col-md-8">
                       <label for="country" class="form-label">Country</label>
                       <select class="js-example-placeholder-single form-control" id="country" required>
-                          <option selected disabled value="">Choose...</option>
+                          <option selected disabled value="World">World</option>
                           {% for item in location_list %}
                               <option value={{ item }}>{{ item }}</option>,
                           {% endfor %}                          
@@ -37,7 +37,7 @@
                   <div class="col-md-8">
                       <label for="year" class="form-label">Year</label>
                       <select class="js-example-placeholder-single form-control" id="year" required>
-                          <option selected disabled value="">Choose...</option>
+                          <!-- <option selected disabled value="">Choose...</option> -->
                           {% for item in years_list %}
                               <option value={{ item }}>{{ item }}</option>,
                           {% endfor %}                          
@@ -46,7 +46,7 @@
                   <div class="col-md-8">
                       <label for="month" class="form-label">Month</label>
                       <select class="js-example-placeholder-single form-control" id="month" required>
-                          <option selected disabled value="">Choose...</option>
+                          <option selected value="">Choose...</option>
                           {% for item in months_list %}
                               <option value={{ item }}>{{ item }}</option>,
                           {% endfor %}                          
@@ -55,7 +55,7 @@
                   <div class="col-md-8">
                       <label for="col_type" class="form-label">Type</label>
                       <select class="js-example-placeholder-single form-control" id="col_type" required>
-                          <option selected disabled value="">Choose...</option>
+                          <!-- <option selected disabled value="">Choose...</option> -->
                           {% for item in disp_type %}
                               <option value={{ item }}>{{ item }}</option>,
                           {% endfor %}                          
@@ -64,12 +64,15 @@
               </div>
           </div>
           <div class="main">
+            <div class="row">
+              <h2 id="country_txt" style="text-align: center;">{{ location }}</h2>
+            </div>
             <div class="row sparkboxes mt-4">
               <div class="col-md-3">
                 <div class="box box1">
                   <div class="details">
-                    <h3>1213</h3>
-                    <h4>CLICKS</h4>
+                    <h3 id="new_case">{{ new_cases[-1] }}</h3>
+                    <h4>NEW CASES</h4>
                   </div>
                   <div id="spark1"></div>
                 </div>
@@ -77,8 +80,8 @@
               <div class="col-md-3">
                 <div class="box box2">
                   <div class="details">
-                    <h3>422</h3>
-                    <h4>VIEWS</h4>
+                    <h3 id="new_death">{{ new_deaths[-1] }}</h3>
+                    <h4>NEW DEATHS</h4>
                   </div>
                   <div id="spark2"></div>
                 </div>
@@ -86,8 +89,8 @@
               <div class="col-md-3">
                 <div class="box box3">
                   <div class="details">
-                    <h3>311</h3>
-                    <h4>LEADS</h4>
+                    <h3 id="total_case">{{ total_cases[-1] }}</h3>
+                    <h4>TOTAL CASES</h4>
                   </div>
                   <div id="spark3"></div>
                 </div>
@@ -95,36 +98,18 @@
               <div class="col-md-3">
                 <div class="box box4">
                   <div class="details">
-                    <h3>22</h3>
-                    <h4>SALES</h4>
+                    <h3 id="total_death">{{ total_deaths[-1] }}</h3>
+                    <h4>TOTAL DEATHS</h4>
                   </div>
                   <div id="spark4"></div>
                 </div>
               </div>
             </div>
 
-            <div class="row mt-4">
-              <div class="col-md-5">
-                <div class="box shadow mt-4">
-                  <div id="radialBarBottom"></div>
-                </div>
-              </div>
-              <div class="col-md-7">
+            <div class="row">
+              <div class="col">
                 <div class="box shadow mt-4">
                   <div id="line-adwords" class=""></div>
-                </div>
-              </div>
-            </div>
-
-            <div class="row mt-4">
-              <div class="col-md-5">
-                <div class="box shadow mt-4">
-                  <div id="barchart"></div>
-                </div>
-              </div>
-              <div class="col-md-7">
-                <div class="box shadow mt-4">
-                  <div id="areachart"></div>
                 </div>
               </div>
             </div>
@@ -150,7 +135,32 @@
             {% endfor %}
         ]
 
+        var column = "{{ column }}";
         var plot_title = "{{ plot_label }}"
+
+        var total_cases_array = [
+            {% for item in total_cases %}
+                {{ item }},
+            {% endfor %}
+        ]
+
+        var total_deaths_array = [
+            {% for item in total_deaths %}
+                {{ item }},
+            {% endfor %}
+        ]
+
+        var new_cases_array = [
+            {% for item in new_cases %}
+                {{ item }},
+            {% endfor %}
+        ]
+
+        var new_deaths_array = [
+            {% for item in new_deaths %}
+                {{ item }},
+            {% endfor %}
+        ]
     </script>     
     <script src="{{ url_for('static', filename='ajax_request.js') }}"></script>
   </body>

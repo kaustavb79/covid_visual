@@ -39,7 +39,7 @@ class CovidData:
     # returns list of all locations available
     def get_locations(self):
         lst = list(self.grouped_by_loc.groups)
-        # lst.remove("World") 
+        lst.remove("World") 
         return lst
     
     # Returns a list of all years data avaliable

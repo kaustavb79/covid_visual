@@ -3,6 +3,7 @@ const choices = {country:"", year:"", month:"",column:""};
 $(document).ready(function(){
     $("#country").change(function(){
 	  	choices.country = $(this).find(":selected").text();
+	  	$("#country_txt").text(choices.country)
 	 	$.ajax({
 		    url: "/new_changes", 
 		    type: "POST",
@@ -11,11 +12,12 @@ $(document).ready(function(){
 		    data: JSON.stringify(choices),
 		    success: function (result) {
 		       console.log(result);
-		       labels_list_updated = result['labels'].split(" ");
-		       data_list_updated = result['data'].split(" ").map(Number);
-		       plot_title_updated = result['plot_label'];
-		       // update_chart(line_chart,data_list_updated,labels_list_updated,plot_title_updated);
-		       // update_chart(bar_chart,data_list_updated,labels_list_updated,plot_title_updated);
+		       result = parse_result(result);
+		       update_sparks(spark_obj1,result,"new_cases","#new_case");
+		       update_sparks(spark_obj2,result,"new_deaths","#new_death");
+		       update_sparks(spark_obj3,result,"total_cases","#total_case");
+		       update_sparks(spark_obj4,result,"total_deaths","#total_death");
+		       update_chart(chartLine,result);
 		    },
 		    error: function (err) {
 		    	alert("error: "+err)
@@ -32,12 +34,13 @@ $(document).ready(function(){
 		    contentType: "application/json; charset=utf-8",
 		    data: JSON.stringify(choices),
 		    success: function (result) {
-		       console.log(result);
-		       labels_list_updated = result['labels'].split(" ");
-		       data_list_updated = result['data'].split(" ").map(Number);
-		       plot_title_updated = result['plot_label'];
-		       // update_chart(line_chart,data_list_updated,labels_list_updated,plot_title_updated);
-		       // update_chart(bar_chart,data_list_updated,labels_list_updated,plot_title_updated);
+		       console.log(result);		       
+		       result = parse_result(result);
+		       update_sparks(spark_obj1,result,"new_cases","#new_case");
+		       update_sparks(spark_obj2,result,"new_deaths","#new_death");
+		       update_sparks(spark_obj3,result,"total_cases","#total_case");
+		       update_sparks(spark_obj4,result,"total_deaths","#total_death");
+		       update_chart(chartLine,result);
 		    },
 		    error: function (err) {
 		    	alert("error: "+err)
@@ -47,6 +50,21 @@ $(document).ready(function(){
 
 	$("#month").change(function(){
 	  choices.month = $(this).find(":selected").text();
+	  $.ajax({
+		    url: "/new_changes", 
+		    type: "POST",
+		    dataType: "json",
+		    contentType: "application/json; charset=utf-8",
+		    data: JSON.stringify(choices),
+		    success: function (result) {
+		       console.log(result);		       
+		       result = parse_result(result);
+		       update_chart(chartLine,result);
+		    },
+		    error: function (err) {
+		    	alert("error: "+err)
+		    }
+		});
 	});
 
 	$("#col_type").change(function(){
@@ -59,11 +77,8 @@ $(document).ready(function(){
 		    data: JSON.stringify(choices),
 		    success: function (result) {
 		       console.log(result);
-		       labels_list_updated = result['labels'].split(" ");
-		       data_list_updated = result['data'].split(" ").map(Number);
-		       plot_title_updated = result['plot_label'];
-		       // update_chart(line_chart,data_list_updated,labels_list_updated,plot_title_updated);
-		       // update_chart(bar_chart,data_list_updated,labels_list_updated,plot_title_updated);
+		       result = parse_result(result);
+		       update_chart(chartLine,result);
 		    },
 		    error: function (err) {
 		    	alert("error: "+err)
@@ -72,112 +87,41 @@ $(document).ready(function(){
 	});
 });	
 
-
 // update chart
-// function update_chart(chart_obj,data_list_updated,labels_list_updated,plot_title_updated){
-// 	chart_obj.data.datasets[0].data = data_list_updated;
-// 	chart_obj.data.datasets[0].label = plot_title_updated;
-// 	chart_obj.data.labels = labels_list_updated;
-// 	chart_obj.update();
-// };
+function update_chart(chart_obj,data_updated){
+	chart_obj.updateOptions({
+	  	series: [{
+	  		name:data_updated["column"],
+	    	data:data_updated["values"]
+	  	}],
+	  	title: {
+    		text: data_updated["plot_title"]
+    	},
+    	labels:data_updated["labels"]
+	});
+};
 
-// -----------------------------------------------------------------------------
-// var options = {
-//     responsive: false,
-//     scales: {
-//         xAxes: [{
-//             ticks: {
-//             maxRotation: 90,
-//             minRotation: 80
-//             },
-//             gridLines: {
-//                 offsetGridLines: true 
-//             }
-//         },
-//         {
-//             position: "top",
-//             ticks: {
-//                 maxRotation: 90,
-//                 minRotation: 80
-//             },
-//             gridLines: {
-//                 offsetGridLines: true 
-//             }
-//         }],
-//         yAxes: [{
-//             ticks: {
-//                 beginAtZero: true
-//             }
-//         }]
-//     }
-// }
+//update sparks
+function update_sparks(spark_obj,data_updated,key,elem_id){
+	spark_obj.updateSeries([{
+	  	data: data_updated[key]
+	}]);
+	$(elem_id).text(data_updated[key].at(-1))
+};
 
-// // Line chart 
-// const line_chart_tag = document.getElementById('line_chart').getContext('2d');
-// const line_chart = new Chart(line_chart_tag, {
-//     type: "line",
-//     data: {
-//         labels: labels_list,
-//         datasets: [
-//             {
-//                 label: plot_title,
-//                 pointRadius: 4,
-//                 pointBackgroundColor: "rgb(0,0,255)",
-//                 data: data_list,
-//                 backgroundColor: [
-//                     'rgb(230, 255, 255)'
-//                 ],                 
-//                 borderWidth: 3,
-//             }
-//         ]
-//     },
-//     options: options
-// });
-
-// // Bar Chart
-// var bar_chart_element = document.getElementById("bar_chart");
-// var bar_chart = new Chart(bar_chart_element, {
-//     type: 'bar',
-//     data: {
-//         labels: labels_list,
-//         datasets: [
-//             {
-//                 label: plot_title,
-//                 data: data_list,
-//                 backgroundColor: [
-//                     'rgba(255, 99, 132)',
-//                     'rgba(54, 162, 235)',
-//                     'rgba(255, 206, 86)',
-//                     'rgba(75, 192, 192)',
-//                     'rgba(153, 102, 255)',
-//                     'rgba(255, 159, 64)',
-//                     'rgba(255, 99, 132)',
-//                     'rgba(54, 162, 235)',
-//                     'rgba(255, 206, 86)',
-//                     'rgba(75, 192, 192)',
-//                     'rgba(153, 102, 255)',
-//                     'rgba(255, 159, 64)'
-//                 ],
-//                 borderColor: [
-//                     'rgba(255,99,132,1)',
-//                     'rgba(54, 162, 235, 1)',
-//                     'rgba(255, 206, 86, 1)',
-//                     'rgba(75, 192, 192, 1)',
-//                     'rgba(153, 102, 255, 1)',
-//                     'rgba(255, 159, 64, 1)',
-//                     'rgba(255,99,132,1)',
-//                     'rgba(54, 162, 235, 1)',
-//                     'rgba(255, 206, 86, 1)',
-//                     'rgba(75, 192, 192, 1)',
-//                     'rgba(153, 102, 255, 1)',
-//                     'rgba(255, 159, 64, 1)'
-//                 ],
-//                 borderWidth: 1
-//             }
-//         ]
-//     },
-//     options: options
-// });
+//get updated values
+function parse_result(result){
+	return {
+		"labels":result['labels'].split(" "),
+		"values":result['data'].split(" ").map(Number),
+		"plot_title":result['plot_label'],
+		"column":result['column'],
+		"new_cases":result['new_cases'].split(" ").map(Number),
+		"new_deaths":result['new_deaths'].split(" ").map(Number),
+		"total_cases":result['total_cases'].split(" ").map(Number),
+		"total_deaths":result['total_deaths'].split(" ").map(Number)
+	};
+};
 
 // --------------------------------------------------------------------------
 // Apex dashboard
@@ -212,7 +156,7 @@ var spark1 = {
     id: 'spark1',
     group: 'sparks',
     type: 'line',
-    height: 80,
+    height: 100,
     sparkline: {
       enabled: true
     },
@@ -225,7 +169,7 @@ var spark1 = {
     }
   },
   series: [{
-    data: [25, 66, 41, 59, 25, 44, 12, 36, 9, 21]
+    data: new_cases_array
   }],
   stroke: {
     curve: 'smooth'
@@ -235,9 +179,9 @@ var spark1 = {
   },
   grid: {
     padding: {
-      top: 20,
-      bottom: 10,
-      left: 110
+      top: 25,
+      bottom: 15,
+      left: 120
     }
   },
   colors: ['#fff'],
@@ -260,7 +204,7 @@ var spark2 = {
     id: 'spark2',
     group: 'sparks',
     type: 'line',
-    height: 80,
+    height: 100,
     sparkline: {
       enabled: true
     },
@@ -273,16 +217,16 @@ var spark2 = {
     }
   },
   series: [{
-    data: [12, 14, 2, 47, 32, 44, 14, 55, 41, 69]
+    data: new_deaths_array
   }],
   stroke: {
     curve: 'smooth'
   },
   grid: {
     padding: {
-      top: 20,
-      bottom: 10,
-      left: 110
+      top: 25,
+      bottom: 15,
+      left: 120
     }
   },
   markers: {
@@ -308,7 +252,7 @@ var spark3 = {
     id: 'spark3',
     group: 'sparks',
     type: 'line',
-    height: 80,
+    height: 100,
     sparkline: {
       enabled: true
     },
@@ -321,7 +265,7 @@ var spark3 = {
     }
   },
   series: [{
-    data: [47, 45, 74, 32, 56, 31, 44, 33, 45, 19]
+    data: total_cases_array
   }],
   stroke: {
     curve: 'smooth'
@@ -331,9 +275,9 @@ var spark3 = {
   },
   grid: {
     padding: {
-      top: 20,
-      bottom: 10,
-      left: 110
+      top: 25,
+      bottom: 15,
+      left: 120
     }
   },
   colors: ['#fff'],
@@ -361,7 +305,7 @@ var spark4 = {
     id: 'spark4',
     group: 'sparks',
     type: 'line',
-    height: 80,
+    height: 100,
     sparkline: {
       enabled: true
     },
@@ -374,7 +318,7 @@ var spark4 = {
     }
   },
   series: [{
-    data: [15, 75, 47, 65, 14, 32, 19, 54, 44, 61]
+    data: total_deaths_array
   }],
   stroke: {
     curve: 'smooth'
@@ -384,9 +328,9 @@ var spark4 = {
   },
   grid: {
     padding: {
-      top: 20,
-      bottom: 10,
-      left: 110
+      top: 25,
+      bottom: 15,
+      left: 120
     }
   },
   colors: ['#fff'],
@@ -409,10 +353,14 @@ var spark4 = {
   }
 }
 
-new ApexCharts(document.querySelector("#spark1"), spark1).render();
-new ApexCharts(document.querySelector("#spark2"), spark2).render();
-new ApexCharts(document.querySelector("#spark3"), spark3).render();
-new ApexCharts(document.querySelector("#spark4"), spark4).render();
+var spark_obj1 = new ApexCharts(document.querySelector("#spark1"), spark1);
+spark_obj1.render();
+var spark_obj2 = new ApexCharts(document.querySelector("#spark2"), spark2);
+spark_obj2.render();
+var spark_obj3 = new ApexCharts(document.querySelector("#spark3"), spark3);
+spark_obj3.render();
+var spark_obj4 = new ApexCharts(document.querySelector("#spark4"), spark4);
+spark_obj4.render();
 
 
 var optionsLine = {
@@ -432,31 +380,18 @@ var optionsLine = {
   },
   stroke: {
     curve: 'smooth',
-    width: 2
+    width: 3
   },
   //colors: ["#3F51B5", '#2196F3'],
   series: [{
-      name: "Music",
-      data: [1, 15, 26, 20, 33, 27]
-    },
-    {
-      name: "Photos",
-      data: [3, 33, 21, 42, 19, 32]
-    },
-    {
-      name: "Files",
-      data: [0, 39, 52, 11, 29, 43]
+      name: column,
+      data: data_list
     }
   ],
   title: {
-    text: 'Media',
-    align: 'left',
+    text: plot_title,
+    align: 'center',
     offsetY: 25,
-    offsetX: 20
-  },
-  subtitle: {
-    text: 'Statistics',
-    offsetY: 55,
     offsetX: 20
   },
   markers: {
@@ -472,7 +407,7 @@ var optionsLine = {
       bottom: 0
     }
   },
-  labels: ['01/15/2002', '01/16/2002', '01/17/2002', '01/18/2002', '01/19/2002', '01/20/2002'],
+  labels: labels_list,
   xaxis: {
     tooltip: {
       enabled: false
@@ -487,124 +422,3 @@ var optionsLine = {
 
 var chartLine = new ApexCharts(document.querySelector('#line-adwords'), optionsLine);
 chartLine.render();
-
-var optionsCircle4 = {
-  chart: {
-    type: 'radialBar',
-    height: 350,
-    width: 380,
-  },
-  plotOptions: {
-    radialBar: {
-      size: undefined,
-      inverseOrder: true,
-      hollow: {
-        margin: 5,
-        size: '48%',
-        background: 'transparent',
-
-      },
-      track: {
-        show: false,
-      },
-      startAngle: -180,
-      endAngle: 180
-
-    },
-  },
-  stroke: {
-    lineCap: 'round'
-  },
-  series: [71, 63, 77],
-  labels: ['June', 'May', 'April'],
-  legend: {
-    show: true,
-    floating: true,
-    position: 'right',
-    offsetX: 70,
-    offsetY: 240
-  },
-}
-
-var chartCircle4 = new ApexCharts(document.querySelector('#radialBarBottom'), optionsCircle4);
-chartCircle4.render();
-
-
-var optionsBar = {
-  chart: {
-    height: 380,
-    type: 'bar',
-    stacked: true,
-  },
-  plotOptions: {
-    bar: {
-      columnWidth: '30%',
-      horizontal: false,
-    },
-  },
-  series: [{
-    name: 'PRODUCT A',
-    data: [14, 25, 21, 17, 12, 13, 11, 19]
-  }, {
-    name: 'PRODUCT B',
-    data: [13, 23, 20, 8, 13, 27, 33, 12]
-  }, {
-    name: 'PRODUCT C',
-    data: [11, 17, 15, 15, 21, 14, 15, 13]
-  }],
-  xaxis: {
-    categories: ['2011 Q1', '2011 Q2', '2011 Q3', '2011 Q4', '2012 Q1', '2012 Q2', '2012 Q3', '2012 Q4'],
-  },
-  fill: {
-    opacity: 1
-  },
-
-}
-
-var chartBar = new ApexCharts(
-  document.querySelector("#barchart"),
-  optionsBar
-);
-
-chartBar.render();
-
-var optionsArea = {
-  chart: {
-    height: 380,
-    type: 'area',
-    stacked: false,
-  },
-  stroke: {
-    curve: 'straight'
-  },
-  series: [{
-      name: "Music",
-      data: [11, 15, 26, 20, 33, 27]
-    },
-    {
-      name: "Photos",
-      data: [32, 33, 21, 42, 19, 32]
-    },
-    {
-      name: "Files",
-      data: [20, 39, 52, 11, 29, 43]
-    }
-  ],
-  xaxis: {
-    categories: ['2011 Q1', '2011 Q2', '2011 Q3', '2011 Q4', '2012 Q1', '2012 Q2'],
-  },
-  tooltip: {
-    followCursor: true
-  },
-  fill: {
-    opacity: 1,
-  },
-
-}
-
-var chartArea = new ApexCharts(
-  document.querySelector("#areachart"),
-  optionsArea
-);
-
-chartArea.render();
