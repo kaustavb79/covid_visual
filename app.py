@@ -1,35 +1,47 @@
-from flask import Flask, Markup, render_template
+from flask import Flask, Markup, render_template,request,url_for
 from data.covid_data import CovidData
 
 app = Flask(__name__)
 
-def get_world_count():
-    pass
+data_url = r"https://github.com/owid/covid-19-data/blob/master/public/data/jhu/full_data.csv?raw=true"
+obj = CovidData(data_url)   
 
-@app.route('/',methods=['GET', 'POST'])
-def home_page() :
-    data_url = r"https://github.com/owid/covid-19-data/blob/master/public/data/jhu/full_data.csv?raw=true"
-    obj = CovidData(data_url)
+@app.route('/new_changes',methods=['GET', 'POST'])
+def change_view():
+    if request.method == 'POST':
+        data = request.get_json()
+        if not data["month"]:
+            if not data["year"]:
+                data["year"] = "2021"
+            yearly_data = obj.get_month_end_data_by_location_and_year(data["country"],int(data["year"]))
+            if not data["column"]:
+                data["column"] = "total_cases"
+            else:
+                data["column"] = data["column"].replace(" ","_").lower()
+            result = {
+                "data":" ".join([str(x) for x in yearly_data[data["column"]].to_list()]),
+                "labels":" ".join([str(x) for x in yearly_data["month"].tolist()]),
+                "plot_label": "{} in {} for {}".format(data["column"].replace("_"," ").capitalize(),data["country"],data["year"])
+            }
+        return(result)
 
-    locations = obj.get_locations()
-    years = obj.get_years()
-    months = obj.get_months()
-
-    loc = "Canada"
+@app.route('/')
+def home_page():    
+    loc = "World"
     yr = 2021
-    col = "New Cases"
+    col = "Total Cases"
     x_label = "Months"
-    yearly_data = obj.get_month_end_data_by_location_and_year(loc,yr)
-
+    default_data = obj.get_month_end_data_by_location_and_year(loc,yr)
     return render_template('index.html',
                 title = "SARS-CoV-2 Data",
                 max = 500,
-                labels = yearly_data["month"].tolist(),
-                values = yearly_data["new_cases"].tolist(),
+                labels = default_data["month"].tolist(),
+                values = default_data["total_cases"].tolist(),
                 plot_label = "{} in {} for {}".format(col,loc,yr),
-                location_list = locations,
-                years_list = years,
-                months_list = months
+                location_list = obj.get_locations(),
+                years_list = obj.get_years(),
+                months_list = obj.get_months(),
+                disp_type = obj.get_columns()
             )
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
- import pandas as pd
+import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
@@ -39,7 +39,7 @@ class CovidData:
     # returns list of all locations available
     def get_locations(self):
         lst = list(self.grouped_by_loc.groups)
-        lst.remove("World") 
+        # lst.remove("World") 
         return lst
     
     # Returns a list of all years data avaliable
@@ -54,6 +54,12 @@ class CovidData:
     def get_dates(self):
         return list(self.df["date"].unique())
     
+    # Returns valid columns
+    def get_columns(self):
+        columns_lst = list(self.df.columns)[2:10]
+        modified_lst = [x.replace("_"," ").capitalize() for x in columns_lst]
+        return modified_lst
+
     """
         Get world wide data for all time
         - Returns:
