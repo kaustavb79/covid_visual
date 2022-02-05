@@ -32,7 +32,7 @@ def home_page():
     col = "Total Cases"
     x_label = "Months"
     default_data = obj.get_month_end_data_by_location_and_year(loc,yr)
-    return render_template('index.html',
+    return render_template('dashboard.html',
                 title = "SARS-CoV-2 Data",
                 max = 500,
                 labels = default_data["month"].tolist(),
