@@ -13,6 +13,18 @@ h1, h2, h3, h4, h5, h6, strong {
   font-weight: 600;
 }
 
+#title{
+	width:100%;
+    text-align:center;
+    font-size: large;
+    font-family: Arial, Helvetica, sans-serif;
+    background-image: url('index.jpg');
+    height:100px;
+    background-repeat: no-repeat;
+    background-attachment: fixed;
+    /* background-position: center;  */
+}
+
 body {
   /*background: linear-gradient(45deg,#3a3a60,#5f5f8e);
   min-height: 100vh;*/
