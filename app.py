@@ -62,7 +62,7 @@ def home_page():
     # new_deaths_lst.sort()
 
     return render_template('dashboard.html',
-                title = "SARS-CoV-2 Data",
+                title = "CoviMeter Dashboard",
                 column = col,
                 labels = default_data["month"].tolist(),
                 values = default_data["total_cases"].tolist(),
