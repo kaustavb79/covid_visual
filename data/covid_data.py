@@ -1,37 +1,16 @@
 import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
-
-config = {
-    "location_col":"location",
-    "date_col":"date",
-    "months":{
-        1:"January",
-        2:"Febuary",
-        3:"March",
-        4:"April",
-        5:"May",
-        6:"June",
-        7:"July",
-        8:"August",
-        9:"September",
-        10:"October",
-        11:"November",
-        12:"December"
-    }
-}
+from sqlalchemy import create_engine
 
 class CovidData:
-    def __init__(self,data_file):
-        self.df = pd.read_csv(data_file)
-        # converting "date" column to Datetime column
-        self.df["CheckDate"] = pd.to_datetime(self.df['date'])
-        # adding year and month column
-        self.df['year'] = pd.DatetimeIndex(self.df['date']).year
-        self.df['month'] = pd.DatetimeIndex(self.df['date']).month
-        self.df['month'] = self.df['month'].apply(lambda x:config["months"][x])
+    def __init__(self,config):
+        sqlEngine = create_engine('mysql+pymysql://{}:{}@{}/{}'.format(config["user"],config["password"],config["databaseServerIP"],config["database"]), pool_recycle=3600)
+        dbConnection = sqlEngine.connect()
+        self.df = pd.read_sql("SELECT * FROM {}.{}".format(config["database"],config["table_name"]),dbConnection)
+        dbConnection.close()
         #grouping the large data by location
-        self.grouped_by_loc = self.df.groupby([config["location_col"]])
+        self.grouped_by_loc = self.df.groupby("location")
         # seaborn plot settings
         sns.set(rc={'figure.figsize':(21.7,8.27)})
         sns.set(style='whitegrid', rc={"grid.linewidth": 0.1})

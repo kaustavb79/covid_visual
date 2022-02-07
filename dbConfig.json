@@ -1,0 +1,8 @@
+{
+    "databaseServerIP":"127.0.0.1",
+    "user":"root",
+    "password":"17121999",
+    "database":"covid",
+    "table_name":"coviddata",
+    "charSet":"utf8mb4"
+}

@@ -1,10 +1,11 @@
 from flask import Flask, Markup, render_template,request,url_for
 from data.covid_data import CovidData
+import json
 
 app = Flask(__name__)
 
-data_url = r"https://github.com/owid/covid-19-data/blob/master/public/data/jhu/full_data.csv?raw=true"
-obj = CovidData(data_url)   
+config = json.load(open("dbConfig.json"))
+obj = CovidData(config)   
 
 @app.route('/new_changes',methods=['GET', 'POST'])
 def change_view():
