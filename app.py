@@ -33,7 +33,7 @@ def change_view():
             "new_deaths":" ".join([str(int(x)) for x in yearly_data["new_deaths"].tolist()]),
             "column":"{}".format(data["column"].replace("_"," ").capitalize())
         }   
-        if not data["month"] or "Choose" in data["month"]:            
+        if not data["month"] or "Select" in data["month"]:            
             result["data"] = " ".join([str(int(x)) for x in yearly_data[data["column"]].to_list()]);
             result["labels"] = " ".join([str(x) for x in yearly_data["month"].tolist()]);
             result["plot_label"] = "{} in {} for {}".format(data["column"].replace("_"," ").capitalize(),data["country"],data["year"])
